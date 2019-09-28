@@ -25,21 +25,21 @@ base_dir = args.base_dir
 IMAGE_SIZE = 224
 BATCH_SIZE = 64
 
-df=pandas.read_csv(args.labels, names=('file','sfw_score','nsfw_score'))
+#df=pandas.read_csv(args.labels, names=('file','sfw_score','nsfw_score'))
 
 #to reduce testing size
-if args.sample_size > 0:
-    df = df.head(args.sample_size)
+#if args.sample_size is not None:
+#    df = df.head(args.sample_size)
 
 datagen = tf.keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255, 
     validation_split=0.2)
-
+"""
 train_generator=datagen.flow_from_dataframe(
     directory=base_dir,
     dataframe=df,
     x_col="file",
-    y_col=["sfw_score", "nsfw_score"],
+    y_col=["nsfw_score"],
     class_mode="raw",
     target_size=(IMAGE_SIZE, IMAGE_SIZE),
     batch_size=BATCH_SIZE)
@@ -48,10 +48,23 @@ val_generator=datagen.flow_from_dataframe(
     directory=base_dir,
     dataframe=df,
     x_col="file",
-    y_col=["sfw_score", "nsfw_score"],
+    y_col=["nsfw_score"],
     class_mode="raw",
     target_size=(IMAGE_SIZE, IMAGE_SIZE),
     batch_size=BATCH_SIZE,
+    subset='validation')
+"""
+
+train_generator = datagen.flow_from_directory(
+    base_dir,
+    target_size=(IMAGE_SIZE, IMAGE_SIZE),
+    batch_size=BATCH_SIZE, 
+    subset='training')
+
+val_generator = datagen.flow_from_directory(
+    base_dir,
+    target_size=(IMAGE_SIZE, IMAGE_SIZE),
+    batch_size=BATCH_SIZE, 
     subset='validation')
 
 IMG_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, 3)
@@ -78,13 +91,7 @@ model = tf.keras.Sequential([
 
 model.compile(optimizer=tf.keras.optimizers.Adam(), #TODO check if this is correct
               loss='categorical_crossentropy', 
-              metrics=['accuracy'])
-
-predictions = model.predict(
-    x=val_generator
-)
-
-print(predictions)
+              metrics=['accuracy', 'binary_accuracy', 'mean_absolute_error', 'mean_absolute_percentage_error', 'cosine_proximity'])
 
 print(model.summary())
 
