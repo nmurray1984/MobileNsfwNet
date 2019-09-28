@@ -16,4 +16,6 @@ RUN pip3 install nsfw
 
 RUN pip3 install pillow
 
+RUN mkdir /datadrive
+
 WORKDIR /workspace
