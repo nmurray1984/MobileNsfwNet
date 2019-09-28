@@ -3,6 +3,9 @@ import tensorflow as tf
 import os
 import pandas
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import argparse
 import pickle
@@ -31,7 +34,7 @@ df=pandas.read_csv(args.labels, names=('file','sfw_score','nsfw_score'))
 
 #to reduce testing size
 #if args.sample_size is not None:
-#    df = df.head(args.sample_size)
+#df = df.head(100)
 
 datagen = tf.keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255, 
