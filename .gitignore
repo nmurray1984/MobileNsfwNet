@@ -107,5 +107,5 @@ venv.bak/
 flower_photos/
 working_files/
 training/models/
-
+training/bottlenecks/
 .DS_Store
