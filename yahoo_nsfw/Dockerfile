@@ -16,6 +16,8 @@ RUN pip3 install nsfw
 
 RUN pip3 install pillow
 
+RUN pip3 install joblib
+
 RUN mkdir /datadrive
 
 WORKDIR /workspace
