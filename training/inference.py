@@ -73,11 +73,11 @@ model = tf.keras.Sequential([
   tf.keras.layers.Conv2D(32, 3, activation='relu'),
   tf.keras.layers.Dropout(0.2),
   tf.keras.layers.GlobalAveragePooling2D(),
-  tf.keras.layers.Dense(2, activation='relu')
+  tf.keras.layers.Dense(2, activation='softmax')
 ])
 
 model.compile(optimizer=tf.keras.optimizers.Adam(), #TODO check if this is correct
-              loss='mean_squared_error', 
+              loss='categorical_crossentropy', 
               metrics=['accuracy'])
 
 predictions = model.predict(
