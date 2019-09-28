@@ -5,6 +5,8 @@ import pandas
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import pickle
+from datetime import datetime
 
 parser = argparse.ArgumentParser('Train some data')
 
@@ -97,21 +99,21 @@ print(model.summary())
 
 print('Number of trainable variables = {}'.format(len(model.trainable_variables)))
 
-epochs = 1
+epochs = 10
 
 history = model.fit_generator(train_generator, 
                     epochs=epochs, 
                     validation_data=val_generator)
-print(model.summary())
 
-saved_model_dir = 'training/models'
-tf.saved_model.save(model, saved_model_dir)
+save_dir = 'training/models/{}'.format(datetime.now().strftime("%Y-%b-%d-%H-%M-%S"))
+os.mkdir(save_dir)
 
-#converter = tf.lite.TFLiteConverter.from_saved_model(saved_model_dir)
-#tflite_model = converter.convert()
+model.save(os.path.join(save_dir, 'model.h5'))
 
-#with open('model.tflite', 'wb') as f:
-#  f.write(tflite_model)
+with open(os.path.join(save_dir, 'history.pickled'), 'wb') as file_pi:
+    pickle.dump(history.history, file_pi)
+
+
 
 # Plot training & validation accuracy values
 plt.plot(history.history['acc'])
@@ -120,7 +122,7 @@ plt.title('Model accuracy')
 plt.ylabel('Accuracy')
 plt.xlabel('Epoch')
 plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
+plt.savefig(os.path.join(save_dir, 'model_accuracy.png'))
 
 # Plot training & validation loss values
 plt.plot(history.history['loss'])
@@ -129,4 +131,4 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
+plt.savefig(os.path.join(save_dir, 'model_loss.png'))

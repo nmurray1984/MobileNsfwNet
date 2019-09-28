@@ -106,5 +106,6 @@ venv.bak/
 # custom
 flower_photos/
 working_files/
+training/models/
 
 .DS_Store
