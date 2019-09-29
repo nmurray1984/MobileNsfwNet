@@ -34,3 +34,4 @@ for x in iterator:
     file_name = 'batch-{}.npz'.format((str(x+1)).zfill(4))
     full_path = os.path.join(args.output_dir, file_name)
     np.savez_compressed(full_path, MobileNetV2_bottleneck_features=output, yahoo_nsfw_output=y_true)
+    print("saved {}".format(full_path))
