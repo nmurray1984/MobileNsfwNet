@@ -17,12 +17,13 @@ parser.add_argument('--bottleneck_dir',
 
 args = parser.parse_args()
 
+training = np.load(open('training/bottlenecks/batch-0001.npz', 'rb'))
+train_data = training['MobileNetV2_bottleneck_features']
+train_labels = training['yahoo_nsfw_output']
 
-train_labels = np.load(open('training/bottlenecks/2019-Sep-28-18-01-37/batch-1.y_true.npy', 'rb'))
-train_data = np.load(open('training/bottlenecks/2019-Sep-28-18-01-37/batch-1.output.npy', 'rb'))
-
-validation_labels = np.load(open('training/bottlenecks/2019-Sep-28-18-01-37/batch-2.y_true', 'rb'))
-validation_data = np.load(open('training/bottlenecks/2019-Sep-28-18-01-37/batch-2.output', 'rb'))
+validation = np.load(open('training/bottlenecks/batch-0002.npz', 'rb'))
+validation_data = validation['MobileNetV2_bottleneck_features']
+validation_labels = validation['yahoo_nsfw_output']
 
 model = tf.keras.Sequential()
 model.add(tf.keras.layers.Flatten(input_shape=train_data.shape[1:]))
