@@ -30,11 +30,14 @@ for image in files:
     with open(image, 'rb') as f:
         response = requests.post(url, headers=headers, data=f)
         text = json.loads(response.text)
-        print('{},{},{},{},{},{}'.format(
-            image,
-            text['Status']['Description'],
-            text['IsImageRacyClassified'],
-            text['RacyClassificationScore'],
-            text['IsImageAdultClassified'],
-            text['AdultClassificationScore'],
-        ))
+        try:
+            print('{},{},{},{},{},{}'.format(
+                image,
+                text['Status']['Description'],
+                text['IsImageRacyClassified'],
+                text['RacyClassificationScore'],
+                text['IsImageAdultClassified'],
+                text['AdultClassificationScore'],
+            ))
+        except KeyError:
+            pass
