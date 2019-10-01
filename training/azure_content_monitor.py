@@ -27,7 +27,7 @@ headers = {
 url = 'https://southcentralus.api.cognitive.microsoft.com/contentmoderator/moderate/v1.0/ProcessImage/Evaluate?CacheImage=false'
 
 for image in files:
-    with open('flower_photos/sunflowers/6204049536_1ac4f09232_n.jpg', 'rb') as f:
+    with open(image, 'rb') as f:
         response = requests.post(url, headers=headers, data=f)
         text = json.loads(response.text)
         print('{},{},{},{},{},{}'.format(
@@ -35,6 +35,6 @@ for image in files:
             text['Status']['Description'],
             text['IsImageRacyClassified'],
             text['RacyClassificationScore'],
-            text['IsImageRacyClassified'],
+            text['IsImageAdultClassified'],
             text['AdultClassificationScore'],
         ))
