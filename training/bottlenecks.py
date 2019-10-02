@@ -14,8 +14,8 @@ from datetime import datetime
 
 parser = argparse.ArgumentParser('Train some data')
 
-parser.add_argument('--base_dir',
-                    help='base directory for images')
+#parser.add_argument('--base_dir',
+#                    help='base directory for images')
 
 parser.add_argument('--labels', 
                     help='text file with file names and associated labels')
@@ -37,7 +37,7 @@ def predict_and_save(x, y_true, batch_num):
 IMAGE_SIZE = 224
 IMG_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, 3)
 BATCH_SIZE = 1000
-base_dir = args.base_dir
+#base_dir = args.base_dir
 df=pandas.read_csv(args.labels)
 
 
@@ -46,7 +46,7 @@ datagen = tf.keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255)
 
 generator=datagen.flow_from_dataframe(
-    directory=base_dir,
+    directory='/',
     dataframe=df,
     x_col="file",
     y_col=['is_racy','racy_score','is_adult','adult_score'],
