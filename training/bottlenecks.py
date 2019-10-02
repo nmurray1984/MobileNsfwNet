@@ -21,23 +21,26 @@ parser.add_argument('--labels',
                     help='text file with file names and associated labels')
 
 parser.add_argument('--sample_size', type=int,
-                    help='sample of images to use for testing purposesß')
+                    help='sample of images to use for testing purposes')
 
 args = parser.parse_args()
 
-def predict_and_save(x, y_true, batch_num):
-    output = model.predict(x)
-    np.save(open(os.path.join(save_dir, "batch-{}.y_true".format(batch_num)), 'wb'), y_true)
-    np.save(open(os.path.join(save_dir, "batch-{}.output".format(batch_num)), 'wb'), output)
-
-IMAGE_SIZE = 224
-IMG_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, 3)
-BATCH_SIZE = 100
-base_dir = args.base_dir
-df=pandas.read_csv(args.labels, names=('file','sfw_score','nsfw_score'))
 
 save_dir = 'training/bottlenecks/{}'.format(datetime.now().strftime("%Y-%b-%d-%H-%M-%S"))
 os.mkdir(save_dir)
+
+def predict_and_save(x, y_true, batch_num):
+    output = model.predict(x)
+    full_file_name = os.path.join(save_dir, "batch-{}.npz".format(batch_num))
+    np.savez_compressed(full_file_name, MobileNetV2_bottleneck_features=output, azure_output=y_true)
+
+IMAGE_SIZE = 224
+IMG_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, 3)
+BATCH_SIZE = 1000
+base_dir = args.base_dir
+df=pandas.read_csv(args.labels)
+
+
 
 datagen = tf.keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255)
@@ -46,7 +49,7 @@ generator=datagen.flow_from_dataframe(
     directory=base_dir,
     dataframe=df,
     x_col="file",
-    y_col=["nsfw_score"],
+    y_col=['is_racy','racy_score','is_adult','adult_score'],
     class_mode="raw",
     target_size=(IMAGE_SIZE, IMAGE_SIZE),
     batch_size=BATCH_SIZE)
