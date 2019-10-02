@@ -36,7 +36,7 @@ def predict_and_save(x, y_true, batch_num):
 
 IMAGE_SIZE = 224
 IMG_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, 3)
-BATCH_SIZE = 1000
+BATCH_SIZE = 100
 #base_dir = args.base_dir
 df=pandas.read_csv(args.labels)
 
@@ -48,9 +48,9 @@ datagen = tf.keras.preprocessing.image.ImageDataGenerator(
 generator=datagen.flow_from_dataframe(
     directory='/',
     dataframe=df,
-    x_col="file",
-    y_col=['is_racy','racy_score','is_adult','adult_score'],
-    class_mode="raw",
+    x_col="file_name",
+    y_col=['file_name', 'is_racy','racy_score','is_adult','adult_score'],
+    class_mode='raw',
     target_size=(IMAGE_SIZE, IMAGE_SIZE),
     batch_size=BATCH_SIZE)
 
@@ -61,7 +61,14 @@ model = tf.keras.applications.MobileNetV2(
 
 batch_num = 1
 
+
+for i in range(1, 10):
+    x, y = generator._get_batches_of_transformed_samples(i)
+    print(x.shape)
+    print(y.shape)
+
 for x, y_true in generator:
+    print(x.shape)
     predict_and_save(x, y_true, batch_num)
     batch_num += 1
     print("Completed batch {}".format(batch_num))
