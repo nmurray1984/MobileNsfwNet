@@ -37,4 +37,6 @@ model.compile(loss='binary_crossentropy',
 print(model.outputs)
 print(model.inputs)
 
+model.save(args.target)
+
 #tfjs.converters.save_keras_model(model, args.target)
