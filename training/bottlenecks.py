@@ -61,12 +61,6 @@ model = tf.keras.applications.MobileNetV2(
 
 batch_num = 1
 
-
-for i in range(1, 10):
-    x, y = generator._get_batches_of_transformed_samples(i)
-    print(x.shape)
-    print(y.shape)
-
 for x, y_true in generator:
     print(x.shape)
     predict_and_save(x, y_true, batch_num)
