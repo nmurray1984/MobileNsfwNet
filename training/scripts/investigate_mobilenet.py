@@ -14,29 +14,12 @@ parser.add_argument('--target',
 
 args = parser.parse_args()
 
-top_model = load_model(args.model, compile=False)
-
 IMAGE_SIZE = 224
 IMG_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, 3)
 
 base_model = tf.keras.applications.MobileNetV2(
     input_shape=IMG_SHAPE,
-    include_top=False, 
+    include_top=True, 
     weights='imagenet')
 
-model = tf.keras.Sequential([
-  base_model,
-  top_model
-])
-
-model.compile(loss='binary_crossentropy',
-              optimizer='rmsprop',
-              metrics=['accuracy'])
-
-
-print(model.outputs)
-print(model.inputs)
-
-model.save(args.target)
-
-#tfjs.converters.save_keras_model(model, args.target)
+base_model.summary()
