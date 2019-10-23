@@ -50,9 +50,9 @@ def predict_img(img):
     print(classes)
     return classes[0]
 
-files = glob.glob(args.scan_folder + "*.*")
+files = glob.glob(args.scan_folder + "*.jpg")
 
-print('Found {} files to scan'.format(len(files)))
+print('Found {} files to scan from directory {}'.format(len(files), args.scan_folder))
 
 save_directory = os.path.join(args.scan_folder, 'positives')
 if not os.path.exists(save_directory):
