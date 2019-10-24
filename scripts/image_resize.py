@@ -15,16 +15,21 @@ parser.add_argument('--save_dir',
 
 args = parser.parse_args()
 
-search_path = args.base_dir + "*/*.jpg"
+search_path = args.base_dir + "*/*.original.jpg"
 all_files = glob.glob(search_path)
 print("Found {} files in directory search path {}".format(len(all_files), search_path))
 
 for file_path in all_files:
-    im = Image.open(file_path)
+    im = Image.open(file_path).convert("RGB")
     im.resize(IMAGE_SIZE)
-    new_file_name = file_path.replace(".original.jpg", ".224x224.jpg")
+    new_file_name = file_path.replace(".224x224","",3)
+    new_file_name = new_file_name.replace(".original.jpg", ".224x224.jpg")
+    
     #create new file path
-    im.save(new_file_name)
+    try:
+        im.save(new_file_name)
+    except IOError:
+        print("File already created for {}".format(new_file_name))
     print("Saved file {}".format(new_file_name))
 
 
