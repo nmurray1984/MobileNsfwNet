@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser('Inference on trained model')
 parser.add_argument('--model',
                     help='model trained on top of MobileNetV2')
 
-parser.add_argument('--scan_folder',
+parser.add_argument('--base_dir',
                     help='folder to scan for images')
 
 args = parser.parse_args()
@@ -41,22 +41,14 @@ def predict_img(file_name):
     img = image.load_img(file_name, target_size=(IMAGE_SIZE, IMAGE_SIZE))
     x = image.img_to_array(img) / 255.
     x = np.expand_dims(x, axis=0)
-    print(x.shape)
     image_array = np.vstack([x])
-    print(image_array.shape)
     classes = model.predict(image_array)
-    print(classes)
-    if int(classes[0][0]) == 1:
-        print("{},{}".format(file_name, int(classes[0][0])))
+    print("{},{},{},{}".format(file_name, classes[0][0], classes[0][1], classes[0][2]))
 
 import glob
 
-files = glob.glob('/Users/nathanmurray/Downloads/e1a1dd3')
+files = glob.glob(args.base_dir + '*.jpg')
 print(len(files))
 
-#for file_name in files:
-#    predict_img(file_name)
-
-predict_img('/Users/nathanmurray/source/MobileNSFW/flower_photos/roses/7683456068_02644b8382_m.jpg')
-predict_img('/Users/nathanmurray/source/MobileNSFW/flower_photos/sunflowers/6953297_8576bf4ea3.jpg')
-predict_img('/Users/nathanmurray/source/MobileNSFW/flower_photos/sunflowers/23204123212_ef32fbafbe.jpg')
+for file_name in files:
+    predict_img(file_name)
