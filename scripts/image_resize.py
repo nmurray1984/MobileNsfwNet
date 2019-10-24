@@ -22,7 +22,7 @@ print("Found {} files in directory search path {}".format(len(all_files), search
 for file_path in all_files:
     im = Image.open(file_path)
     im.resize(IMAGE_SIZE)
-    new_file_name = file_path.replace(".jpg", ".224x224.jpg")
+    new_file_name = file_path.replace(".original.jpg", ".224x224.jpg")
     #create new file path
     im.save(new_file_name)
     print("Saved file {}".format(new_file_name))
