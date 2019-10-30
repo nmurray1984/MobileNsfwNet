@@ -8,7 +8,7 @@ import numpy as np # linear algebra
 import os # accessing directory structure
 import os
 import glob
-
+from sklearn.metrics import classification_report, confusion_matrix
 import argparse
 
 parser = argparse.ArgumentParser('Train from a csv')
@@ -57,12 +57,14 @@ class NumPyFileGenerator(Sequence):
                 x_row = bottleneck_data['bottleneck']
                 x = np.append(x, [x_row], axis=0)
                 y_row = 0
-                if self.class_list[i] == 'sunflowers':
+                if self.class_list[i] == 'racy':
                         y_row = 1
+                elif self.class_list[i] == 'adult':
+                        y_row = 2
                 y = np.append(y, [y_row], axis=0)
-        return x, to_categorical(y, num_classes=2)
+        return x, to_categorical(y, num_classes=3)
 
-VALIDATION_PERCENT = .20
+VALIDATION_PERCENT = .30
 
 train_start = 0
 train_end = int(len(df) * (1 - VALIDATION_PERCENT))
@@ -84,15 +86,32 @@ model = tf.keras.Sequential([
   tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(7, 7, 1280)),
   tf.keras.layers.Dropout(0.2),
   tf.keras.layers.GlobalAveragePooling2D(),
-  tf.keras.layers.Dense(2,activation='softmax')
+  tf.keras.layers.Dense(3,activation='softmax')
 ])
 model.compile(optimizer=tf.keras.optimizers.Adam(), 
               loss='categorical_crossentropy', 
               metrics=['accuracy'])
 
 history = model.fit_generator(train_generator, 
-                    epochs=10, 
+                    epochs=1, 
                     validation_data=validation_generator)
 
 model.save('output.h5')
 
+
+def mapitems(item):
+   if item == 'racy':
+      return 1
+   elif item == 'adult':
+      return 2
+   else:
+      return 0
+
+
+Y_pred = model.predict_generator(validation_generator)
+y_pred = np.argmax(Y_pred, axis=1)
+print(len(y_pred))
+print(y_pred)
+Y_true = df[validation_start:validation_end]['new_class'].tolist()
+y_true = list(map(mapitems, Y_true)) 
+print(confusion_matrix(y_true[0:14000], y_pred[0:14000]))
