@@ -13,11 +13,13 @@ import argparse
 
 parser = argparse.ArgumentParser('Train from a csv')
 
-parser.add_argument('--save_model_file',
-                    help='save_model_file')
-
 parser.add_argument('--csv_file',
                     help='file with list of files and their classes')
+
+parser.add_argument('--inference_only',dest='inference_only', action='store_true')
+parser.set_defaults(inference_only=False)
+
+parser.add_argument('--model', help="Model file to load instead of clean start")
 
 args = parser.parse_args()
 
@@ -81,22 +83,27 @@ validation_generator = NumPyFileGenerator(df[validation_start:validation_end], 3
 
 #base_model.trainable = False
 
-model = tf.keras.Sequential([
-  #base_model,
-  tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(7, 7, 1280)),
-  tf.keras.layers.Dropout(0.2),
-  tf.keras.layers.GlobalAveragePooling2D(),
-  tf.keras.layers.Dense(3,activation='softmax')
-])
+model = None
+if(args.model):
+    model = load_model(args.model, compile=False)
+else:
+    model = tf.keras.Sequential([
+        tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(7, 7, 1280)),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Dense(3,activation='softmax')
+    ])
+
 model.compile(optimizer=tf.keras.optimizers.Adam(), 
               loss='categorical_crossentropy', 
               metrics=['accuracy'])
 
-history = model.fit_generator(train_generator, 
+if not args.inference_only:
+    history = model.fit_generator(train_generator, 
                     epochs=1, 
                     validation_data=validation_generator)
 
-model.save('output.h5')
+    model.save('output.h5')
 
 
 def mapitems(item):
@@ -107,7 +114,7 @@ def mapitems(item):
    else:
       return 0
 
-
+print('Building confusion matrix')
 Y_pred = model.predict_generator(validation_generator)
 y_pred = np.argmax(Y_pred, axis=1)
 print(len(y_pred))
