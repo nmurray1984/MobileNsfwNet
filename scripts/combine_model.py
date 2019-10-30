@@ -1,7 +1,6 @@
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 import argparse
-import tensorflowjs as tfjs
 
 
 parser = argparse.ArgumentParser('Combines trained top model with full MobileNetV2 model')
