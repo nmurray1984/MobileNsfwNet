@@ -152,4 +152,5 @@ print(len(y_pred))
 print(y_pred)
 Y_true = df[validation_start:validation_end]['new_class'].tolist()
 y_true = list(map(mapitems, Y_true)) 
-print(confusion_matrix(y_true[0:9000], y_pred[0:9000]))
+total_predictions = Y_pred.shape[0]
+print(confusion_matrix(y_true[0:total_predictions], y_pred[0:total_predictions]))
