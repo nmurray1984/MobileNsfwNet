@@ -41,13 +41,14 @@ else:
 
 files = glob.glob(args.base_dir + '*/*.224x224.jpg')
 print(len(files))
-files = files[0:10]
+#files = files[0:10]
 
 num_of_batches = int(len(files) / BATCH_SIZE) + 1 
 
 
 
 for batch in range(0, num_of_batches):
+    print('Starting batch {} of {}'.format(batch, num_of_batches))
     start = batch * BATCH_SIZE
     end = start + BATCH_SIZE - 1
     batch_files = files[start:end]
