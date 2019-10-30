@@ -3,6 +3,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.keras.utils import Sequence
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.models import load_model
 import pandas
 import numpy as np # linear algebra
 import os # accessing directory structure
