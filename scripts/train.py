@@ -22,6 +22,9 @@ parser.set_defaults(inference_only=False)
 
 parser.add_argument('--model', help="Model file to load instead of clean start")
 
+parse.add_argument('--use_bottlenecks',dest='use_bottlenecks', action='store_true')
+parse.set_defaults(use_bottlenecks=False)
+
 args = parser.parse_args()
 
 #ensures repeatability of experiments
@@ -69,14 +72,39 @@ class NumPyFileGenerator(Sequence):
 
 VALIDATION_PERCENT = .30
 
-train_start = 0
-train_end = int(len(df) * (1 - VALIDATION_PERCENT))
-validation_start = train_end + 1
-validation_end = len(df)
-print(train_end)
-print(validation_end)
-train_generator = NumPyFileGenerator(df[train_start:train_end], 32)
-validation_generator = NumPyFileGenerator(df[validation_start:validation_end], 32)
+train_generator = None
+validation_generator = None
+if args.use_bottlenecks:
+    train_start = 0
+    train_end = int(len(df) * (1 - VALIDATION_PERCENT))
+    validation_start = train_end + 1
+    validation_end = len(df)
+    train_generator = NumPyFileGenerator(df[train_start:train_end], 32)
+    validation_generator = NumPyFileGenerator(df[validation_start:validation_end], 32)
+else:
+
+    datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+    rescale=1./255, 
+    validation_split=0.2)
+
+    train_generator=datagen.flow_from_dataframe(
+        directory='',
+        dataframe=df,
+        x_col="file_name",
+        y_col=["new_class"],
+        class_mode="categorical",
+        target_size=(224, 224),
+        batch_size=32)
+
+    val_generator=datagen.flow_from_dataframe(
+        directory='',
+        dataframe=df,
+        x_col="file_name",
+        y_col=["new_class"],
+        class_mode="categorical",
+        target_size=(224, 224),
+        batch_size=32,
+        subset='validation')
 
 #base_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
 #                                              include_top=False, 
