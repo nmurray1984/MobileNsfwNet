@@ -87,7 +87,7 @@ else:
 
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255, 
-    validation_split=0.2)
+    validation_split=0.3)
 
     train_generator=datagen.flow_from_dataframe(
         directory='',
@@ -106,6 +106,7 @@ else:
         class_mode="categorical",
         target_size=(224, 224),
         batch_size=32,
+        shuffle=False,
         subset='validation')
 
 #base_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
@@ -118,16 +119,65 @@ model = None
 if(args.model):
     model = load_model(args.model, compile=False)
 else:
-    model = tf.keras.Sequential([
-        tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(7, 7, 1280)),
-        tf.keras.layers.Dropout(0.2),
-        tf.keras.layers.GlobalAveragePooling2D(),
-        tf.keras.layers.Dense(3,activation='softmax')
-    ])
+    pass
+#    model = tf.keras.Sequential([
+#        tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(7, 7, 1280)),
+#        tf.keras.layers.Dropout(0.2),
+#        tf.keras.layers.GlobalAveragePooling2D(),
+#        tf.keras.layers.Dense(3,activation='softmax')
+#    ])
+
+def prediction_variance(y_true, y_pred):
+    final = K.var(y_pred)
+    return final
+
+def prediction_max(y_true, y_pred):
+    act = K.argmax(y_true, axis=0)
+    pred = K.argmax(y_pred, axis=0)
+    #adult_correct = K.sum(K.all(K.concatenate([act >= 2, pred >= 2], axis=1), dtype='float16'))
+
+    adult_correct = K.sum(K.cast(K.equal(act >= 2,pred >= 2), dtype='float16'))
+    adult_act = K.sum(K.cast(act >= 2, dtype='float16'))
+    final = adult_correct / adult_act
+    #final = K.mean(K.cast(pred >= 2, dtype='float16') / K.cast(act >= 2, dtype='float16')
+    return final
+
+def prediction_min(y_true, y_pred):
+    act = K.argmax(y_true, axis=0)
+    pred = K.argmax(y_pred, axis=0)
+    print(y_true.shape)
+    print(y_pred.shape)
+    print(act.shape)
+    print(pred.shape)
+    final = K.min(act) #/ K.cast(y_true >= 0,dtype='float16')
+    return final
+
+def prediction_mean(y_true, y_pred):
+    final = K.mean(y_pred)
+    return final
+
+def true_max(y_true, y_pred):
+    final = K.max(y_true)
+    return final
+
+def prediction_min(y_true, y_pred):
+    final = K.min(y_pred)
+    return final
+
+def true_min(y_true, y_pred):
+    final = K.min(y_true)
+    return final
+
+def true_mean(y_true, y_pred):
+    final = K.mean(y_true)
+    return final
+
+for idx, layer in enumerate(model.layers):
+    layer.trainable = False
 
 model.compile(optimizer=tf.keras.optimizers.Adam(), 
               loss='categorical_crossentropy', 
-              metrics=['accuracy'])
+              metrics=['accuracy', prediction_variance, prediction_max, prediction_min, prediction_mean, prediction_min, true_max, true_min, true_mean])
 
 if not args.inference_only:
     history = model.fit_generator(train_generator, 
@@ -135,22 +185,26 @@ if not args.inference_only:
                     validation_data=validation_generator)
 
     model.save('output.h5')
-
+else:
+#    output = model.evaluate_generator(generator=validation_generator,verbose=1)
+#    print(output)
+#    print(dir(output))
+    pass
 
 def mapitems(item):
-   if item == 'racy':
+   if item == '1-racy':
       return 1
-   elif item == 'adult':
+   elif item == '2-adult':
       return 2
    else:
       return 0
 
 print('Building confusion matrix')
-Y_pred = model.predict_generator(validation_generator)
+Y_pred = model.predict_generator(validation_generator, verbose=1)
 y_pred = np.argmax(Y_pred, axis=1)
-print(len(y_pred))
-print(y_pred)
+np.save('predictions', Y_pred)
 Y_true = df[validation_start:validation_end]['new_class'].tolist()
-y_true = list(map(mapitems, Y_true)) 
+y_true = list(map(mapitems, Y_true))
+np.save('actuals', y_true) 
 total_predictions = Y_pred.shape[0]
 print(confusion_matrix(y_true[0:total_predictions], y_pred[0:total_predictions]))
