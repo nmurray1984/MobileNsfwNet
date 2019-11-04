@@ -70,6 +70,40 @@ class NumPyFileGenerator(Sequence):
                 y = np.append(y, [y_row], axis=0)
         return x, to_categorical(y, num_classes=3)
 
+class ImageFileGenerator(Sequence):
+    def __init__(self, file_list, batch_size):
+        self.file_list = file_list
+        self.class_list = file_list['new_class'].tolist()
+        self.file_name_list = file_list['file_name'].tolist()
+        self.batch_size = batch_size
+
+    def __len__(self):
+        return int(len(self.file_name_list) / self.batch_size)
+
+    def get_bottleneck_file_name(self, original):
+        dirname = os.path.dirname(original)
+        basename = os.path.basename(original)
+        #hardcoding for now
+        model = 'mobilenet_v2_1.0_224'
+        new_basename = basename.replace('224x224.jpg', model + '-bottleneck.npz')
+        return os.path.join(dirname, new_basename)
+
+    def __getitem__(self, idx):
+        x = np.empty((0, 224, 224, 3))
+        y = np.empty((0))
+        for i in range(idx * self.batch_size, ((idx + 1) * self.batch_size)):
+                file_name = self.file_name_list[i]
+                img = image.load_img(file_name, target_size=(IMAGE_SIZE, IMAGE_SIZE))
+                x_row = image.img_to_array(img) / 255.
+                x = np.append(x, [x_row], axis=0)
+                y_row = 0
+                if self.class_list[i] == 'racy':
+                        y_row = 1
+                elif self.class_list[i] == 'adult':
+                        y_row = 2
+                y = np.append(y, [y_row], axis=0)
+        return x, to_categorical(y, num_classes=3)
+
 VALIDATION_PERCENT = .30
 
 train_generator = None
@@ -84,7 +118,9 @@ if args.use_bottlenecks:
     train_generator = NumPyFileGenerator(df[train_start:train_end], 32)
     validation_generator = NumPyFileGenerator(df[validation_start:validation_end], 32)
 else:
-
+    train_generator = ImageFileGenerator(df[train_start:train_end], 32)
+    validation_generator = ImageFileGenerator(df[validation_start:validation_end], 32)
+'''
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
     rescale=1./255, 
     validation_split=0.3)
@@ -108,7 +144,7 @@ else:
         batch_size=32,
         shuffle=False,
         subset='validation')
-
+'''
 #base_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
 #                                              include_top=False, 
 #                                              weights='imagenet')
