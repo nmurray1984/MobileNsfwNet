@@ -64,9 +64,9 @@ class NumPyFileGenerator(Sequence):
                 x_row = bottleneck_data['bottleneck']
                 x = np.append(x, [x_row], axis=0)
                 y_row = 0
-                if self.class_list[i] == 'racy':
+                if self.class_list[i] == '1-racy':
                         y_row = 1
-                elif self.class_list[i] == 'adult':
+                elif self.class_list[i] == '2-adult':
                         y_row = 2
                 y = np.append(y, [y_row], axis=0)
         return x, to_categorical(y, num_classes=3)
@@ -98,9 +98,9 @@ class ImageFileGenerator(Sequence):
                 x_row = image.img_to_array(img) / 255.
                 x = np.append(x, [x_row], axis=0)
                 y_row = 0
-                if self.class_list[i] == 'racy':
+                if self.class_list[i] == '1-racy':
                         y_row = 1
-                elif self.class_list[i] == 'adult':
+                elif self.class_list[i] == '2-adult':
                         y_row = 2
                 y = np.append(y, [y_row], axis=0)
         return x, to_categorical(y, num_classes=3)
