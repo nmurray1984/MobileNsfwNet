@@ -133,7 +133,7 @@ model = None
 if(args.model):
     model = load_model(args.model, compile=False)
     if(args.use_bottlenecks):
-        model = model[1] #use the top layer
+        model = model.layers[1] #use the top layer
 else:
     base_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
                                               include_top=False, 
