@@ -121,31 +121,7 @@ if args.use_bottlenecks:
 else:
     train_generator = ImageFileGenerator(df[train_start:train_end], 32)
     validation_generator = ImageFileGenerator(df[validation_start:validation_end], 32)
-'''
-    datagen = tf.keras.preprocessing.image.ImageDataGenerator(
-    rescale=1./255, 
-    validation_split=0.3)
 
-    train_generator=datagen.flow_from_dataframe(
-        directory='',
-        dataframe=df,
-        x_col="file_name",
-        y_col="new_class",
-        class_mode="categorical",
-        target_size=(224, 224),
-        batch_size=32)
-
-    validation_generator=datagen.flow_from_dataframe(
-        directory='',
-        dataframe=df,
-        x_col="file_name",
-        y_col="new_class",
-        class_mode="categorical",
-        target_size=(224, 224),
-        batch_size=32,
-        shuffle=False,
-        subset='validation')
-'''
 #base_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
 #                                              include_top=False, 
 #                                              weights='imagenet')
@@ -153,22 +129,33 @@ else:
 #base_model.trainable = False
 
 model = None
+
 if(args.model):
     model = load_model(args.model, compile=False)
+    if(args.use_bottlenecks):
+        model = model[1] #use the top layer
 else:
-    pass
-#    model = tf.keras.Sequential([
-#        tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(7, 7, 1280)),
-#        tf.keras.layers.Dropout(0.2),
-#        tf.keras.layers.GlobalAveragePooling2D(),
-#        tf.keras.layers.Dense(3,activation='softmax')
-#    ])
+    base_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
+                                              include_top=False, 
+                                              weights='imagenet')
+    base_model.trainable = False
 
-def prediction_variance(y_true, y_pred):
-    final = K.var(y_pred)
-    return final
+    model = tf.keras.Sequential([
+        base_model,
+        tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(7, 7, 1280)),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Dense(3,activation='softmax')
+    ])
+    if(args.use_bottlenecks):
+        model = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(7, 7, 1280)),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.GlobalAveragePooling2D(),
+            tf.keras.layers.Dense(3,activation='softmax')
+        ])  
 
-def prediction_max(y_true, y_pred):
+def test_custom_metric(y_true, y_pred):
     act = K.argmax(y_true, axis=0)
     pred = K.argmax(y_pred, axis=0)
     #adult_correct = K.sum(K.all(K.concatenate([act >= 2, pred >= 2], axis=1), dtype='float16'))
@@ -179,42 +166,9 @@ def prediction_max(y_true, y_pred):
     #final = K.mean(K.cast(pred >= 2, dtype='float16') / K.cast(act >= 2, dtype='float16')
     return final
 
-def prediction_min(y_true, y_pred):
-    act = K.argmax(y_true, axis=0)
-    pred = K.argmax(y_pred, axis=0)
-    print(y_true.shape)
-    print(y_pred.shape)
-    print(act.shape)
-    print(pred.shape)
-    final = K.min(act) #/ K.cast(y_true >= 0,dtype='float16')
-    return final
-
-def prediction_mean(y_true, y_pred):
-    final = K.mean(y_pred)
-    return final
-
-def true_max(y_true, y_pred):
-    final = K.max(y_true)
-    return final
-
-def prediction_min(y_true, y_pred):
-    final = K.min(y_pred)
-    return final
-
-def true_min(y_true, y_pred):
-    final = K.min(y_true)
-    return final
-
-def true_mean(y_true, y_pred):
-    final = K.mean(y_true)
-    return final
-
-for idx, layer in enumerate(model.layers):
-    layer.trainable = False
-
 model.compile(optimizer=tf.keras.optimizers.Adam(), 
               loss='categorical_crossentropy', 
-              metrics=['accuracy', prediction_variance, prediction_max, prediction_min, prediction_mean, prediction_min, true_max, true_min, true_mean])
+              metrics=['accuracy', test_custom_metric])
 
 if not args.inference_only:
     history = model.fit_generator(train_generator, 
@@ -222,11 +176,6 @@ if not args.inference_only:
                     validation_data=validation_generator)
 
     model.save('output.h5')
-else:
-#    output = model.evaluate_generator(generator=validation_generator,verbose=1)
-#    print(output)
-#    print(dir(output))
-    pass
 
 def mapitems(item):
    if item == '1-racy':
