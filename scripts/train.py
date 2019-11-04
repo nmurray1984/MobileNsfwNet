@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.keras.utils import Sequence
@@ -93,7 +94,7 @@ class ImageFileGenerator(Sequence):
         y = np.empty((0))
         for i in range(idx * self.batch_size, ((idx + 1) * self.batch_size)):
                 file_name = self.file_name_list[i]
-                img = image.load_img(file_name, target_size=(IMAGE_SIZE, IMAGE_SIZE))
+                img = image.load_img(file_name, target_size=(224, 224))
                 x_row = image.img_to_array(img) / 255.
                 x = np.append(x, [x_row], axis=0)
                 y_row = 0
