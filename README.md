@@ -1,6 +1,6 @@
 # Try it out
 
-If you'd like to to try it out, install the (Chrome Extension)[https://github.com/nmurray1984/porn-detector-chrome-extension
+If you'd like to to try it out, install the [Chrome Extension](https://github.com/nmurray1984/porn-detector-chrome-extension)
 
 # MobileNsfwNet
 
