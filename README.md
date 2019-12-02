@@ -1,6 +1,6 @@
 # Try it out
 
-If you'd like to to try it out, install the [Chrome Extension](https://github.com/nmurray1984/porn-blocker-chrome-extension)
+If you'd like to to try it out, install the [Chrome Extension](https://chrome.google.com/webstore/detail/porn-blocker/jdjldnifikfcmahncbamfcglceiegbje?hl=en)
 
 # MobileNsfwNet
 
