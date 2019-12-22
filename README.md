@@ -4,17 +4,17 @@ If you'd like to to try it out, install the [Chrome Extension](https://chrome.go
 
 # MobileNsfwNet
 
-This project is meant to further the availability of NSFW detection on all devices. Porn is available instantly just about anywhere - phones, tablets, TVs, gaming consoles, etc. Unfortunately, for those don't want to see it or keep others from seeing it (children), the tools availible are unreliable or . We are striving to build the following:
+This project is meant to further the availability of NSFW detection on all devices. Porn is available instantly just about anywhere - phones, tablets, TVs, gaming consoles, etc. Unfortunately, for those don't want to see it or keep others from seeing it, the tools availible are unreliable or easy to get around. We are striving to solve this problem by building the following:
 
-1) A neural network that accurately detects pornographic images. There are many other types of NSFW content - either by category (violence) or media (video, audio, text). The goal of this project is to focus on porn at this time.
+1) A neural network that accurately detects pornographic images.
 
-2) Strive to keep processing power to a minimum
+2) Continually experiment to reduce the processing power required for inference
 
 3) Release it for free
 
 # How it's built
 
-The original training dataset was built using tools provided by ______. Each image was then verified as NSFW by running it through Azure's Content Moderator service. Those classifications where then used to train a MobileNetv2 classifier (chosen due to its small size).
+The original training dataset was built using tools provided by [####](https://github.com/alex000kim/nsfw_data_scraper). Each image was then verified as NSFW by running it through Azure's Content Moderator service. Those classifications where then used to train a MobileNetv2 classifier (chosen due to its small size).
 
 # Where is the dataset?
 
