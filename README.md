@@ -14,7 +14,7 @@ This project is meant to further the availability of NSFW detection on all devic
 
 # How it's built
 
-The original training dataset was built using tools provided by [####](https://github.com/alex000kim/nsfw_data_scraper). Each image was then verified as NSFW by running it through Azure's Content Moderator service. Those classifications where then used to train a MobileNetv2 classifier (chosen due to its small size).
+The original training dataset was built using tools provided by [alex000kim](https://github.com/alex000kim/nsfw_data_scraper). Each image was then verified as NSFW by running it through Azure's Content Moderator service. Those classifications where then used to train a MobileNetv2 classifier (chosen due to its small size).
 
 # Where is the dataset?
 
